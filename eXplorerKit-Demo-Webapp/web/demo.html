@@ -1,0 +1,167 @@
+<html>
+<title>xCore 200 Accelerometer and GPIO Demo Webapp</title>
+<head>
+<style>
+.pushbutton {
+  font-family: arial;
+  text-align:center;
+  box-shadow: 1px 1px 1px;
+  padding: 10px 25px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  border: 2px solid;
+}
+</style>
+</head>
+<body onload="initLEDStates()">
+<h1>xCore 200 Accelerometer and GPIO Demo Webapp</h1>
+<div>
+<b>X:</b> <span id="X"></span><b>	|	 Y:</b> <span id="Y"></span><b>	|	 Z:</b> <span id="Z"></span>
+</div>
+<canvas id="smoothie-canvas" width="800" height="276"></canvas>
+<script type="text/javascript" src="smoothie.js"></script>
+<script>
+
+var xhr = new XMLHttpRequest();
+
+var smoothie = new SmoothieChart({millisPerPixel:50,grid:{verticalSections:9}});
+smoothie.streamTo(document.getElementById("smoothie-canvas"), 2000);
+
+// Data
+var lineX = new TimeSeries();
+var lineY = new TimeSeries();
+var lineZ = new TimeSeries();
+
+// Add to SmoothieChart
+smoothie.addTimeSeries(lineX, {lineWidth:2,strokeStyle:'#ff0009',fillStyle:'rgba(214,32,34,0.30)'});
+smoothie.addTimeSeries(lineY, {lineWidth:2,strokeStyle:'#00ff17',fillStyle:'rgba(32,214,55,0.30)'});
+smoothie.addTimeSeries(lineZ, {lineWidth:2,strokeStyle:'#0019ff',fillStyle:'rgba(32,55,214,0.30)'});
+
+// Poll from gpioget.html and set String and Chart values	
+setInterval(function()
+{
+	xhr.open("GET","gpioget.html",false);
+	xhr.timeout = 5000;
+	//xhr.ontimeout = function() { };	
+	xhr.send();
+
+	// Hidden DIV innerHTML hack for reading States from HTML (a la XML)
+
+	document.getElementById("textdiv").innerHTML = xhr.responseText;
+	document.getElementById("textdiv").style.display = 'none';
+
+	document.getElementById("X").innerHTML = textdiv.getElementsByTagName("h1")[0].innerHTML;
+	document.getElementById("Y").innerHTML = textdiv.getElementsByTagName("h2")[0].innerHTML;
+	document.getElementById("Z").innerHTML = textdiv.getElementsByTagName("h3")[0].innerHTML;
+	
+	lineX.append(new Date().getTime(), document.getElementById("X").innerHTML);
+	lineY.append(new Date().getTime(), document.getElementById("Y").innerHTML);
+	lineZ.append(new Date().getTime(), document.getElementById("Z").innerHTML);
+
+	document.getElementById("stateButton1").style.backgroundColor = (textdiv.getElementsByTagName("h5")[0].innerHTML == "1") ? "#ffff00" : "#ffffff";
+
+	document.getElementById("stateButton2").style.backgroundColor = (textdiv.getElementsByTagName("h4")[0].innerHTML == "1") ? "#ffff00" : "#ffffff";
+
+}, 500);
+</script>
+<script>
+
+var leds = [];
+var pled_id = [3,2,1,0,4];  // Reverse LED and Reset State mapping
+
+function initLEDStates() {
+
+ postState(4); // Reset LEDs on page reload
+  
+ for(i = 0; i < 4; i++) 
+ {
+	postState(i);	// Init states
+	leds[i] = 0;
+ }
+ 
+ document.getElementById("stateRGB").style.backgroundColor = "Gray";
+ document.getElementById("stateGreen").style.backgroundColor = "#81e778";
+
+ document.getElementById("led1").style.backgroundColor = "#e78178";
+ document.getElementById("led2").style.backgroundColor = "#81e778";
+ document.getElementById("led3").style.backgroundColor = "#8178e7";
+ document.getElementById("led4").style.backgroundColor = "#81e778";
+
+}
+
+function postState(led_id) {
+
+ xhr.open('POST','gpioset.html', false);
+ xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+ 
+ postString = "l"+pled_id[led_id]+"=1";
+
+ xhr.send(postString);
+
+}
+
+function changeState(led_id) {
+
+ leds[led_id] = !leds[led_id];
+
+ if (led_id < 3)
+ {
+   var RGBString = "#";
+
+   if (led_id == 0) {
+	postState(0);		
+	document.getElementById("led1").style.backgroundColor = (leds[led_id]) ? "#ff0000" : "#e78178";
+   }
+   else if (led_id == 1) {
+	postState(1);
+	document.getElementById("led2").style.backgroundColor = (leds[led_id]) ? "#00ff00" : "#81e778";
+   }
+   else if (led_id == 2) {
+	postState(2); 
+	document.getElementById("led3").style.backgroundColor = (leds[led_id]) ? "#0000ff" : "#8178e7";
+   }
+   
+   for(i=0; i < 3; i++) RGBString += (leds[i]) ? "ff" : "00";
+   
+    if (RGBString == "#000000") RGBString = "Gray";
+    document.getElementById("stateRGB").style.backgroundColor = RGBString;
+ }
+
+ else if (led_id == 3) {
+	postState(3);
+	document.getElementById("led4").style.backgroundColor = (leds[led_id]) ? "#00ff00" : "#81e778";
+	document.getElementById("stateGreen").style.backgroundColor = (leds[led_id]) ? "#00ff00" : "#81e778";
+ }
+}
+</script>
+<br>
+<h3>LED Color Select</h3> 
+<table width=400 height=100>
+  <tr>
+    <th colspan="3"></th>
+    <th colspan="1" width="100"></th>
+  </tr>
+  <tr>
+    <td id="stateRGB" class="pushbutton" colspan="3">RGB LED</td>
+    <td id="stateGreen" class="pushbutton" colspan="1" width="100">Green LED</td>
+  </tr>
+  <tr></tr>
+  <tr>
+    <td id="led1" colspan="1" class="pushbutton" onclick="changeState(0)">Red</td>
+    <td id="led2" colspan="1" class="pushbutton" onclick="changeState(1)">Green</td>
+    <td id="led3" colspan="1" class="pushbutton" onclick="changeState(2)">Blue</td>
+    <td id="led4" colspan="1" class="pushbutton" onclick="changeState(3)">Green</td> 
+  </tr>
+</table>
+<br>
+<h3>Push Button Press</h3>
+<table width=400 height=50>
+  <tr>
+    <td id="stateButton1" class="pushbutton">Button 1</td>
+    <td id="stateButton2" class="pushbutton">Button 2</td>
+  </tr>
+</table>
+<div id="textdiv"></div>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<html>
+<body>
+
+<h1>XMOS HTTP Webserver demo</h1>
+
+<p>This is a demo of the XMOS Embedded Webserver library. This
+  library preprocesses website data and stores it in program
+  memory or external SPI flash. You can include text and images:</p>
+
+<p><img src="images/xmos_logo.png" /></p>
+
+<p>The file system of the web tree is reflected in the server:</p>
+
+<ul>
+<li><a href="page.html">Another page</a></li>
+<li><a href="dir1/page.html">A page in a sub-directory</a></li>
+<li><a href="gpio.html">GPIO control page</a></li>
+</ul>
+
+<p>You can also include dynamic content like this timestamp from an <b>XC
+  timer: {% get_timer_value(buf) %}</b>
+</p>
+
+<p>
+  The functions called during rendering can also include state. For
+  example, here is a page load counter for this page: <b>{% get_counter_value(app_state,buf) %}</b>
+</p>
+
+
+<p>The server can also understand html form data. Try entering some
+  text in the field below</p>
+
+<form name="form" action = "form.html" method="post">
+<input name='input' type='text'/>
+<input type="submit" Value="Go!"/>
+</form>
+
+</body>
+</html>

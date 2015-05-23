@@ -1,0 +1,87 @@
+<html>
+<head>
+<style type="text/css">
+.button
+{
+display: block;
+width: 84px;
+height: 69px;
+background-image: url(images/button.jpg);
+background-repeat: no-repeat;
+}
+.up
+{
+background-position: 0px 0px;
+}
+
+.down
+{
+background-position: -81px 0px;
+}
+</style>
+</head>
+  <body>
+    <h1>GPIO Control Page</h1>
+    <p>{% process_web_page_data(buf,app_state, connection_state) %}</p>
+    <form name="form" action ="" method="post">
+      <h3>Control LEDs :</h3>
+      <table border='1'><tbody align="center">
+		<tr>
+		  <td width='150'><b>LED 0</b></td>
+		  <td width='80'>
+		  	<button type="submit" name="l0" value="1">Toggle</button>
+		  </td>
+		  <td width="100">
+		  	<img src="images/{% get_led_image(buf,app_state,0) %}" height="60" width="60" />
+		  </td>
+		</tr>
+		<tr>
+		  <td width='150'><b>LED 1</b></td>
+		  <td width='80'>
+		  	<button type="submit" name="l1" value="1">Toggle</button>
+		  </td>
+		  <td width="100"> 
+		  	<img src="images/{% get_led_image(buf,app_state,1) %}" height="60" width="60"/>
+		  </td>
+		</tr>
+		<tr>
+		  <td width='150'><b>LED 2</b></td>
+		  <td width='80'>
+		  	<button type="submit" name="l2" value="1">Toggle</button>
+		  </td>
+		  <td width="100">
+		  	<img src="images/{% get_led_image(buf,app_state,2) %}" height="60" width="60"/>
+		  </td>
+		</tr>
+		<tr>
+		  <td width='150'><b>LED 3</b></td>
+		  <td width='80'>
+		  	<button type="submit" name="l3" value="1">Toggle</button>
+		  </td>
+		  <td width="100">
+		  	<img src="images/{% get_led_image(buf,app_state,3) %}" height="60" width="60"/>
+		  </td>
+		</tr>
+	  </tbody></table>
+	</form>
+	<h3>Button status : </h3>
+	{% update_button_status(app_state) %}
+	<table border='1'><tbody align="center">
+		<tr>
+		  <td width='150'><b>Button 1</b></td>
+		  <td width='80'>{% get_button_state_str(buf, app_state, 0) %}</td>
+		  <td width="100">
+		  	<span class="button {% get_button_state_img(buf, app_state, 0) %}"></span>
+		  </td>
+		</tr>
+		<tr>
+		  <td width='150'><b>Button 2</b></td>
+		  <td width='80'>{% get_button_state_str(buf, app_state, 1) %}</td>
+		  <td width="100">
+		  	<span class="button {% get_button_state_img(buf, app_state, 1) %}"></span>
+		  </td>
+		</tr>
+	</tbody></table>
+	<p><a href="/gpio.html"><button>Button status</button></a></p>
+  </body>
+</html>
