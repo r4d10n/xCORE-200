@@ -1,6 +1,8 @@
 xCore 200 eXplorerKit - Demo Webapp
 ===================================
 
+![ScreenShot](https://raw.githubusercontent.com/r4d10n/xCORE-200/master/eXplorerKit-Demo-Webapp/xCore200-Demo-Webapp.png)
+
 Application for demonstrating the integrated possibilities of the xCore 200 eXplorerKit. 
 
 - Live streaming and Graphing of Accelerometer readings
